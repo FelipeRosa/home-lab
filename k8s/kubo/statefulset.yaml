@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kubo
+spec:
+  selector:
+    matchLabels:
+      app: kubo
+  serviceName: kubo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubo
+    spec:
+      containers:
+        - name: kubo
+          image: ipfs/kubo:v0.18.1
+          volumeMounts:
+            - name: storage
+              mountPath: /data/ipfs
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
