@@ -49,6 +49,5 @@ spec:
           requests:
             storage: 80Gi
         volumeMode: Filesystem
-        storageClassName: longhorn-fast
         accessModes:
           - ReadWriteOnce
