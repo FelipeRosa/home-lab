@@ -27,6 +27,8 @@ spec:
               "/config/topology.json",
               "--database-path",
               "/storage/cardano-node-db",
+              "--socket-path",
+              "/storage/node.socket",
             ]
           resources:
             limits:
