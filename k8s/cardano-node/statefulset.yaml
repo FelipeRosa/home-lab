@@ -50,6 +50,7 @@ spec:
         resources:
           requests:
             storage: 80Gi
+        storageClassName: openebs-fast
         volumeMode: Filesystem
         accessModes:
           - ReadWriteOnce
