@@ -1,13 +1,14 @@
-resource "kubernetes_namespace" "monitoring" {
+resource "kubernetes_config_map" "prometheus_config" {
   metadata {
-    name = "monitoring"
+    name = "prometheus-config"
+  }
+  data = {
+    "prometheus.yml" = file("./prometheus-config/prometheus.yml")
   }
 }
-
 resource "kubernetes_stateful_set" "prometheus" {
   metadata {
-    name      = "prometheus"
-    namespace = "monitoring"
+    name = "prometheus"
   }
 
   spec {
@@ -44,8 +45,20 @@ resource "kubernetes_stateful_set" "prometheus" {
           }
 
           volume_mount {
-            name       = "storage"
-            mount_path = "/storage"
+            name       = "data"
+            mount_path = "/data"
+          }
+          volume_mount {
+            name       = "config-file"
+            mount_path = "/etc/prometheus/prometheus.yml"
+            sub_path   = "prometheus.yml"
+          }
+        }
+
+        volume {
+          name = "config-file"
+          config_map {
+            name = kubernetes_config_map.prometheus_config.metadata[0].name
           }
         }
       }
@@ -53,7 +66,7 @@ resource "kubernetes_stateful_set" "prometheus" {
 
     volume_claim_template {
       metadata {
-        name = "storage"
+        name = "data"
       }
 
       spec {

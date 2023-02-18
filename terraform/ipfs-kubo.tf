@@ -1,4 +1,4 @@
-resource "kubernetes_stateful_set" "ipfs-kubo" {
+resource "kubernetes_stateful_set" "ipfs_kubo" {
   metadata {
     name = "ipfs-kubo"
   }

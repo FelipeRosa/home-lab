@@ -1,4 +1,4 @@
-resource "kubernetes_config_map" "cardano-node-config" {
+resource "kubernetes_config_map" "cardano_node_config" {
   metadata {
     name = "cardano-node-config"
   }
@@ -9,9 +9,9 @@ resource "kubernetes_config_map" "cardano-node-config" {
   }
 }
 
-resource "kubernetes_stateful_set" "cardano-node" {
+resource "kubernetes_stateful_set" "cardano_node" {
   depends_on = [
-    kubernetes_config_map.cardano-node-config
+    kubernetes_config_map.cardano_node_config
   ]
 
   metadata {
@@ -72,7 +72,7 @@ resource "kubernetes_stateful_set" "cardano-node" {
         volume {
           name = "config"
           config_map {
-            name = kubernetes_config_map.cardano-node-config.metadata[0].name
+            name = kubernetes_config_map.cardano_node_config.metadata[0].name
           }
         }
       }
