@@ -6,6 +6,7 @@ resource "kubernetes_config_map" "prometheus_config" {
     "prometheus.yml" = file("./prometheus-config/prometheus.yml")
   }
 }
+
 resource "kubernetes_stateful_set" "prometheus" {
   metadata {
     name = "prometheus"
@@ -78,6 +79,24 @@ resource "kubernetes_stateful_set" "prometheus" {
           }
         }
       }
+    }
+  }
+}
+
+resource "kubernetes_service" "prometheus" {
+  metadata {
+    name = "prometheus"
+  }
+
+  spec {
+    selector = {
+      app = "prometheus"
+    }
+
+    port {
+      protocol    = "TCP"
+      port        = 9090
+      target_port = 9090
     }
   }
 }
