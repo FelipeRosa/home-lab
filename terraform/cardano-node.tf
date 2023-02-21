@@ -38,7 +38,7 @@ resource "kubernetes_stateful_set" "cardano_node" {
       spec {
         container {
           name  = "cardano-node"
-          image = "inputoutput/cardano-node:1.35.3"
+          image = "inputoutput/cardano-node:1.35.5"
           command = [
             "cardano-node",
             "run",
@@ -51,6 +51,11 @@ resource "kubernetes_stateful_set" "cardano_node" {
             "--socket-path",
             "/data/node.socket",
           ]
+
+          env {
+            name  = "CARDANO_NODE_SOCKET_PATH"
+            value = "/data/node.socket"
+          }
 
           resources {
             limits = {
