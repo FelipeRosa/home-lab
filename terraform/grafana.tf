@@ -47,21 +47,21 @@ resource "kubernetes_stateful_set" "grafana" {
 
           volume_mount {
             name       = "data"
-            mount_path = "/data"
+            mount_path = "/var/lib/grafana"
           }
-          # volume_mount {
-          #   name       = "config-file"
-          #   mount_path = "/etc/grafana/grafana.yml"
-          #   sub_path   = "grafana.yml"
-          # }
+          volume_mount {
+            name       = "config-file"
+            mount_path = "/etc/grafana/grafana.ini"
+            sub_path   = "grafana.ini"
+          }
         }
 
-        # volume {
-        #   name = "config-file"
-        #   config_map {
-        #     name = kubernetes_config_map.grafana_config.metadata[0].name
-        #   }
-        # }
+        volume {
+          name = "config-file"
+          config_map {
+            name = kubernetes_config_map.grafana_config.metadata[0].name
+          }
+        }
       }
     }
 
