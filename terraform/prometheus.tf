@@ -1,3 +1,38 @@
+resource "kubernetes_service_account" "prometheus" {
+  metadata {
+    name = "prometheus"
+  }
+}
+
+resource "kubernetes_secret_v1" "prometheus_service_account_token" {
+  metadata {
+    name = "prometheus-service-account-token"
+    annotations = {
+      "kubernetes.io/service-account.name" = "prometheus"
+    }
+  }
+
+  type = "kubernetes.io/service-account-token"
+}
+
+resource "kubernetes_cluster_role_binding" "prometheus" {
+  metadata {
+    name = "prometheus"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+
+  subject {
+    kind = "ServiceAccount"
+    name = "prometheus"
+  }
+}
+
+
 resource "kubernetes_config_map" "prometheus_config" {
   metadata {
     name = "prometheus-config"
@@ -30,14 +65,20 @@ resource "kubernetes_stateful_set" "prometheus" {
       }
 
       spec {
+        service_account_name = "prometheus"
+
         container {
           name  = "prometheus"
           image = "prom/prometheus:v2.42.0"
+          args = [
+            "--config.file=/etc/prometheus/prometheus.yml",
+            "--log.level=debug"
+          ]
 
           resources {
             limits = {
-              cpu    = "75m"
-              memory = "128Mi"
+              cpu    = "125m"
+              memory = "512Mi"
             }
           }
 
