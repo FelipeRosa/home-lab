@@ -52,16 +52,16 @@ resource "kubernetes_stateful_set" "cardano_node" {
             "/data/node.socket",
           ]
 
-          env {
-            name  = "CARDANO_NODE_SOCKET_PATH"
-            value = "/data/node.socket"
-          }
-
           resources {
             limits = {
               cpu    = "2000m"
               memory = "2Gi"
             }
+          }
+
+          env {
+            name  = "CARDANO_NODE_SOCKET_PATH"
+            value = "/data/node.socket"
           }
 
           volume_mount {
@@ -71,6 +71,12 @@ resource "kubernetes_stateful_set" "cardano_node" {
           volume_mount {
             name       = "data"
             mount_path = "/data"
+          }
+
+          port {
+            name           = "metrics"
+            protocol       = "TCP"
+            container_port = 12798
           }
         }
 
@@ -97,6 +103,25 @@ resource "kubernetes_stateful_set" "cardano_node" {
           }
         }
       }
+    }
+  }
+}
+
+resource "kubernetes_service" "cardano-node" {
+  metadata {
+    name = "cardano-node"
+  }
+
+  spec {
+    selector = {
+      app = "cardano-node"
+    }
+
+    port {
+      name     = "metrics"
+      protocol = "TCP"
+      port     = 12798
+      target_port = "metrics"
     }
   }
 }

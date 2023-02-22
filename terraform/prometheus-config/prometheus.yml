@@ -5,3 +5,9 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana.default.svc.cluster.local"]
+  - job_name: "cardano-node"
+    static_configs:
+      - targets: ["cardano-node.default.svc.cluster.local:12798"]
