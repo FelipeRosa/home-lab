@@ -80,6 +80,43 @@ resource "kubernetes_stateful_set" "cardano_node" {
           }
         }
 
+        container {
+          name  = "cardano-wallet"
+          image = "inputoutput/cardano-wallet:2022.12.14"
+          args = [
+            "serve",
+            "--listen-address",
+            "0.0.0.0",
+            "--node-socket",
+            "/data/node.socket",
+            "--testnet",
+            "/config/byron-genesis.json",
+            "--database",
+            "/data/wallet-database"
+          ]
+
+          resources {
+            limits = {
+              cpu    = "1000m"
+              memory = "512Mi"
+            }
+          }
+
+          volume_mount {
+            name       = "config"
+            mount_path = "/config"
+          }
+          volume_mount {
+            name       = "data"
+            mount_path = "/data"
+          }
+
+          port {
+            name           = "api"
+            container_port = 8090
+          }
+        }
+
         volume {
           name = "config"
           config_map {
@@ -107,7 +144,7 @@ resource "kubernetes_stateful_set" "cardano_node" {
   }
 }
 
-resource "kubernetes_service" "cardano-node" {
+resource "kubernetes_service" "cardano_node" {
   metadata {
     name = "cardano-node"
   }
@@ -118,10 +155,17 @@ resource "kubernetes_service" "cardano-node" {
     }
 
     port {
-      name     = "metrics"
-      protocol = "TCP"
-      port     = 12798
+      name        = "metrics"
+      protocol    = "TCP"
+      port        = 12798
       target_port = "metrics"
+    }
+
+    port {
+      name        = "api"
+      protocol    = "TCP"
+      port        = 8090
+      target_port = "api"
     }
   }
 }
